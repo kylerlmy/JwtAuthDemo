@@ -27,9 +27,11 @@ namespace JwtAuth
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<JwtSettings>(Configuration.GetSection("JwtSettings"));//获取Json文件中的某一个节点的配置，如果直接传递Configuration，拿不到配置
-            var jwtSettings = new JwtSettings();
-            Configuration.Bind("JwtSettings", jwtSettings);
+
+            // var setings=Configuration.GetSection("JwtSettings:Audience");
+            // services.Configure<JwtSettings>(Configuration.GetSection("JwtSettings"));//获取Json文件中的某一个节点的配置，如果直接传递Configuration，拿不到配置
+            // var jwtSettings = new JwtSettings();
+            // Configuration.Bind("JwtSettings", jwtSettings);
 
 
             services.AddAuthentication(options =>
@@ -39,11 +41,15 @@ namespace JwtAuth
             })
             .AddJwtBearer(o =>
             {
-                o.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                o.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidIssuer = jwtSettings.Issuer,
-                    ValidAudience = jwtSettings.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = Configuration["JwtSettings:Issuer"],//jwtSettings.Issuer,
+                    ValidAudience =Configuration["JwtSettings:Audience"], //jwtSettings.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSettings:SecretKey"]))
                 };
             });
             services.AddMvc();
