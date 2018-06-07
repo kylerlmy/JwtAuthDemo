@@ -38,11 +38,12 @@ namespace JwtAuth.Controllers {
                 nbf: 定义在什么时间之前，该jwt都是不可用的.
                 iat: jwt的签发时间
                 jti: jwt的唯一身份标识，主要用来作为一次性token,从而回避重放攻击。
-                */
+                */  
 
                 var claims = new Claim[] {
                     new Claim (ClaimTypes.Name, "kyle"), 
-                    new Claim (ClaimTypes.Role, "admin")
+                    new Claim (ClaimTypes.Role, "admin"),
+                    new Claim("SuperAdminOnly","true")
                 };
 
                 var key = new SymmetricSecurityKey (Encoding.UTF8.GetBytes (_config["JwtSettings:SecretKey"])); //_jwtSettings.SecretKey

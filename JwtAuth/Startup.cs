@@ -41,16 +41,31 @@ namespace JwtAuth
             })
             .AddJwtBearer(o =>
             {
-                o.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = Configuration["JwtSettings:Issuer"],//jwtSettings.Issuer,
-                    ValidAudience =Configuration["JwtSettings:Audience"], //jwtSettings.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSettings:SecretKey"]))
+                // o.TokenValidationParameters = new TokenValidationParameters
+                // {
+                //     ValidateIssuer = true,
+                //     ValidateAudience = true,
+                //     ValidateLifetime = true,
+                //     ValidateIssuerSigningKey = true,
+                //     ValidIssuer = Configuration["JwtSettings:Issuer"],//jwtSettings.Issuer,
+                //     ValidAudience =Configuration["JwtSettings:Audience"], //jwtSettings.Audience,
+                //     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSettings:SecretKey"]))
+                // };
+
+
+                o.SecurityTokenValidators.Clear();
+                o.SecurityTokenValidators.Add(new MyTokenValidator());
+                o.Events=new JwtBearerEvents(){
+                    OnMessageReceived=context=>{
+                        var token=context.Request.Headers["myToken"];
+                        context.Token=token.FirstOrDefault();
+                        return Task.CompletedTask;
+                    }
                 };
+            });
+
+            services.AddAuthorization(options=>{
+                options.AddPolicy("SuperAdminOnly",policy=>policy.RequireClaim("SuperAdminOnly"));
             });
             services.AddMvc();
         }
