@@ -14,7 +14,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace JwtAuth.Controllers {
-    [Route ("api/[controller]")]//不使用Route特性（请求地址设置为http://localhost:5000/Authorize/Token）时，返回404
+    [Route ("api/[controller]")] //不使用Route特性（请求地址设置为http://localhost:5000/Authorize/Token）时，返回404
     public class AuthorizeController : Controller {
         //  private JwtSettings _jwtSettings;
         private IConfiguration _config;
@@ -25,7 +25,7 @@ namespace JwtAuth.Controllers {
 
         [AllowAnonymous]
         [HttpPost]
-        public IActionResult Token ([FromBody] LoginViewModel viewModel) {//不使用[FromBody]返回400（bad request）
+        public IActionResult Token ([FromBody] LoginViewModel viewModel) { //不使用[FromBody]返回400（bad request）
             if (ModelState.IsValid) {
                 if (!(viewModel.User == "kyle" && viewModel.Password == "123456"))
                     return BadRequest ();
@@ -41,10 +41,10 @@ namespace JwtAuth.Controllers {
                 */
 
                 var claims = new Claim[] {
-                    new Claim (ClaimTypes.Name, "kyle"), 
-                    new Claim (ClaimTypes.Role, "admin")
+                    new Claim (ClaimTypes.Name, "kyle"),
+                    new Claim (ClaimTypes.Role, "admin"),
+                    new Claim ("SuperAdminOnly", "true")//使用Policy 的authorize时，必须指定，否则 403
                 };
-
                 var key = new SymmetricSecurityKey (Encoding.UTF8.GetBytes (_config["JwtSettings:SecretKey"])); //_jwtSettings.SecretKey
                 var creds = new SigningCredentials (key, SecurityAlgorithms.HmacSha256);
                 var token = new JwtSecurityToken (_config["JwtSettings:Issuer"], //_jwtSettings.Issuer

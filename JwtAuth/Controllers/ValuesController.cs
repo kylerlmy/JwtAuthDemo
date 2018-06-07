@@ -6,7 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace JwtAuth.Controllers {
     [Route ("api/[controller]")]
-    [Authorize]
+    // [Authorize(Roles="user")]  //角色
+    [Authorize(Policy="SuperAdminOnly")] //策略,AspNet Core主张策略
     public class ValuesController : Controller {
         // GET api/values
         [HttpGet]
